@@ -14,3 +14,4 @@ TODOs:
  * Better error/checking and user feedback
  * Code documentation.
  * DVD support.
+ * Add a proper setup.py and launcher script.
