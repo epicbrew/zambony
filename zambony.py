@@ -8,14 +8,23 @@ from subprocess import *
 from tempfile import mkdtemp
 from fcntl import ioctl
 
-
-drive_status = {CDS_NO_DISC: "No disk",
-                CDS_TRAY_OPEN: "No disk",
-                CDS_DRIVE_NOT_READY: "Loading",
-                CDS_DISC_OK: "Ready"}
+#
+# Maps drive status codes from ioctl to human readable strings.
+#
+drive_status = {
+        CDS_NO_DISC:         "No disk",
+        CDS_TRAY_OPEN:       "No disk",
+        CDS_DRIVE_NOT_READY: "Loading",
+        CDS_DISC_OK:         "Ready",
+        }
 
 
 class FileInfo:
+    """Class that provides name and size information for a file or directory
+    that is to be burned.
+
+    """
+
     def __init__(self, path):
         self.path = path
 
@@ -38,8 +47,8 @@ class FileInfo:
 
     @property
     def name(self):
-        #basename = self.path.split(os.sep)[-1]
         basename = os.path.basename(self.path)
+
         if os.path.isdir(self.path):
             basename += '/'
 
@@ -50,6 +59,11 @@ class FileInfo:
 
 
 class StatusWindow(Toplevel):
+    """Status window that essentially tails a file, displaying text as it is
+    written to the file.
+
+    """
+
     def __init__(self, file):
         Toplevel.__init__(self)
         self.file = file
@@ -83,6 +97,8 @@ class StatusWindow(Toplevel):
 
 
 class DeviceInfo:
+    """Class for basic information about a CDROM device."""
+
     cdr = False
     dvdr = False
     bluray = False
@@ -95,6 +111,8 @@ class DeviceInfo:
 
     @property
     def capabilities(self):
+        """Returns a string representing the capabilities of this device."""
+
         caps = ""
         if not self.cdr and not self.dvdr:
             caps += "Not Writable"
@@ -113,6 +131,8 @@ class DeviceInfo:
 
 
 class Zambony:
+    """Main application class."""
+
     device_status_alarm = None
 
     def __init__(self):
@@ -144,6 +164,11 @@ class Zambony:
 
 
     def get_device_info(self):
+        #
+        # This should be reworked. Parsing info out of /proc isn't a good way
+        # to find all of the CDROM devices.
+        #
+
         f = open('/proc/sys/dev/cdrom/info')
         lines = f.readlines()
         f.close()
@@ -337,6 +362,9 @@ class Zambony:
 
         
     def create_images(self):
+        """Creates images from image data embedded in strings.
+        """
+
         self.burn_img = PhotoImage(format='gif',data=
              'R0lGODlhGAAYAPcAAP4RA/8ZAP8pAP82AP84Af9DAf9OAv9EC/9TAv9dAv9Z'
             +'Cf9HFP9cHf9kAf9sAP9uC/9zAf97Af91C/54D/5oGP1wE/9zHP5OJv5SKu1O'
